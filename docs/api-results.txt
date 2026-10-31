@@ -1,0 +1,87 @@
+== REST 8080: add 10 points to alice (key demo-a1) ==
+HTTP/1.1 200 
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Sat, 31 Oct 2026 06:54:12 GMT
+
+{"score":10,"rank":1,"user_id":"alice"}
+== REST 8080: repeat same key demo-a1 (score must NOT grow) ==
+HTTP/1.1 200 
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Sat, 31 Oct 2026 06:54:12 GMT
+
+{"score":10,"rank":1,"user_id":"alice"}
+== REST 8080: add 20 points to bob (key demo-b1) ==
+HTTP/1.1 200 
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Sat, 31 Oct 2026 06:54:12 GMT
+
+{"score":20,"rank":1,"user_id":"bob"}
+== REST 8080: top 2 ==
+HTTP/1.1 200 
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Sat, 31 Oct 2026 06:54:12 GMT
+
+{"data":[{"rank":1,"score":20,"user_id":"bob"},{"rank":2,"score":10,"user_id":"alice"}]}
+== REST 8080: rank of alice ==
+HTTP/1.1 200 
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Sat, 31 Oct 2026 06:54:13 GMT
+
+{"score":10,"rank":2,"user_id":"alice"}
+== REST 8080: unknown user (expect 404) ==
+HTTP/1.1 404 
+Content-Type: text/plain;charset=UTF-8
+Content-Length: 19
+Date: Sat, 31 Oct 2026 06:54:13 GMT
+
+User does not exist
+== REST 8080: no Idempotency-Key header (expect 400) ==
+HTTP/1.1 400 
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Sat, 31 Oct 2026 06:54:13 GMT
+Connection: close
+
+{"timestamp":"2026-10-31T06:54:13.035+00:00","status":400,"error":"Bad Request","path":"/v1/scores"}
+== gRPC 9090: add 7 points to carol (key grpc-c1) ==
+{
+  "userId": "carol",
+  "score": 7,
+  "rank": 3
+}
+== gRPC 9090: repeat same key grpc-c1 (score must NOT grow) ==
+{
+  "userId": "carol",
+  "score": 7,
+  "rank": 3
+}
+== gRPC 9090: top 2 ==
+{
+  "data": [
+    {
+      "rank": 1,
+      "userId": "bob",
+      "score": 20
+    },
+    {
+      "rank": 2,
+      "userId": "alice",
+      "score": 10
+    }
+  ]
+}
+== gRPC 9090: rank of carol ==
+{
+  "userId": "carol",
+  "score": 7,
+  "rank": 3
+}
+== gRPC 9090: unknown user (expect NotFound) ==
+ERROR:
+  Code: NotFound
+  Message: User does not exist
