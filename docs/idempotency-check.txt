@@ -1,0 +1,25 @@
+fariza@MacBook-Air-Fariza leaderboard-service % grpcurl -plaintext -import-path src/main/proto -proto leaderboard.proto -d '{"user_id":"dave","points":5,"idempotency_key":"g-key-1"}' localhost:9090 leaderboard.v1.Leaderboard/UpdateScore
+{
+  "userId": "dave",
+  "score": 5,
+  "rank": 2
+}
+fariza@MacBook-Air-Fariza leaderboard-service % grpcurl -plaintext -import-path src/main/proto -proto leaderboard.proto -d '{"user_id":"dave","points":5,"idempotency_key":"g-key-1"}' localhost:9090 leaderboard.v1.Leaderboard/UpdateScore
+{
+  "userId": "dave",
+  "score": 5,
+  "rank": 2
+}
+fariza@MacBook-Air-Fariza leaderboard-service % grpcurl -plaintext -import-path src/main/proto -proto leaderboard.proto -d '{"user_id":"dave","points":5,"idempotency_key":"g-key-2"}' localhost:9090 leaderboard.v1.Leaderboard/UpdateScore
+{
+  "userId": "dave",
+  "score": 10,
+  "rank": 1
+}
+fariza@MacBook-Air-Fariza leaderboard-service % curl -i http://localhost:8080/v1/scores/dave 
+HTTP/1.1 200 
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Sat, 31 Oct 2026 05:25:47 GMT
+
+{"score":10,"rank":1,"user_id":"dave"}%                                                                                           
