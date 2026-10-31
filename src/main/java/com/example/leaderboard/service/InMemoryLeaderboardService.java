@@ -5,30 +5,30 @@ import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Service
 public class InMemoryLeaderboardService implements LeaderboardService {
     // The public methods are synchronized, so a plain HashMap and HashSet are safe here.
     // This keeps the in-memory mock simple and easy to explain in class.
     private final Map<String, Integer> scoresByUser = new HashMap<>();
-    private final Set<String> processedIdempotencyKeys = new HashSet<>();
+    private final Map<String, UserScore> processedIdempotencyKeys = new HashMap<>();
 
     @Override
     public synchronized UserScore updateScore(String userId, int points, String idempotencyKey) {
-        if (processedIdempotencyKeys.contains(idempotencyKey)) {
-            return getUserScore(userId);
+        if (processedIdempotencyKeys.containsKey(idempotencyKey)) {
+            return processedIdempotencyKeys.get(idempotencyKey);
         }
 
         int currentScore = scoresByUser.getOrDefault(userId, 0);
         int updatedScore = currentScore + points;
         scoresByUser.put(userId, updatedScore);
-        processedIdempotencyKeys.add(idempotencyKey);
 
-        return getUserScore(userId);
+        UserScore userScore = getUserScore(userId);
+        processedIdempotencyKeys.put(idempotencyKey, userScore);
+
+        return userScore;
     }
 
     @Override

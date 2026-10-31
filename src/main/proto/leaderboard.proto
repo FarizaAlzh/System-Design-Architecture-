@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package leaderboard.v1;
+
+option java_package = "com.example.leaderboard.grpc";
+option java_multiple_files = true;
+
+service Leaderboard {
+  rpc UpdateScore (UpdateScoreRequest) returns (UserScoreReply);
+  rpc GetTopScores (TopScoresRequest) returns (TopScoresReply);
+  rpc GetUserScore (UserScoreRequest) returns (UserScoreReply);
+}
+
+message UpdateScoreRequest {
+  string user_id = 1;
+  int32 points = 2;
+  string idempotency_key = 3;
+}
+
+message UserScoreReply {
+  string user_id = 1;
+  int32 score = 2;
+  int32 rank = 3;
+}
+
+message TopScoresRequest {
+  int32 limit = 1;
+}
+
+message TopScoresReply {
+  repeated LeaderboardEntry data = 1;
+}
+
+message LeaderboardEntry {
+  int32 rank = 1;
+  string user_id = 2;
+  int32 score = 3;
+}
+
+message UserScoreRequest {
+  string user_id = 1;
+}
